@@ -3,3 +3,5 @@ venv/
 migrations/
 __pycache__/
 db.sqlite3
+.env
+inventory.log

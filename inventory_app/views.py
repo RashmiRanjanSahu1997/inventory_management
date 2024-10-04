@@ -8,6 +8,9 @@ from .models import Item
 from .serializers import ItemSerializer
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
+logger = logging.getLogger(__name__)
+from django.core.cache import cache
+from django.conf import settings
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -47,10 +50,21 @@ class ItemCreateView(APIView):
 class ItemDetailView(APIView):
     def get(self, request, item_id):
         try:
-            item = get_object_or_404(Item, id=item_id)
-            serializer = ItemSerializer(item)
-            logger.info(f"Item with id {item_id} retrieved successfully")
-            return Response(serializer.data)
+            # Try to get the item from the cache
+            cache_key = f'item_{item_id}'
+            item = cache.get(cache_key)
+
+            if not item:  # If not found in cache, retrieve from the database
+                item = get_object_or_404(Item, id=item_id)
+                serializer = ItemSerializer(item)
+
+                # Store the item in Redis cache for future requests
+                cache.set(cache_key, serializer.data, timeout=settings.CACHE_TTL)
+                logger.info(f"Item with id {item_id} cached successfully")
+            else:
+                logger.info(f"Item with id {item_id} retrieved from cache")
+
+            return Response(item)
         except Item.DoesNotExist:
             logger.warning(f"Item with id {item_id} not found")
             return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -64,7 +78,12 @@ class ItemDetailView(APIView):
             serializer = ItemSerializer(item, data=request.data)
             if serializer.is_valid():
                 serializer.save()
-                logger.info(f"Item with id {item_id} updated successfully")
+
+                # Update the cache with the new item data
+                cache_key = f'item_{item_id}'
+                cache.set(cache_key, serializer.data, timeout=settings.CACHE_TTL)
+                logger.info(f"Item with id {item_id} updated and cached successfully")
+
                 return Response(serializer.data)
             logger.warning(f"Validation failed for item update: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -79,7 +98,12 @@ class ItemDetailView(APIView):
         try:
             item = get_object_or_404(Item, id=item_id)
             item.delete()
-            logger.info(f"Item with id {item_id} deleted successfully")
+
+            # Delete the item from the cache
+            cache_key = f'item_{item_id}'
+            cache.delete(cache_key)
+            logger.info(f"Item with id {item_id} deleted and cache cleared")
+
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Item.DoesNotExist:
             logger.warning(f"Item with id {item_id} not found")
@@ -87,4 +111,3 @@ class ItemDetailView(APIView):
         except Exception as e:
             logger.error(f"Unexpected error: {str(e)}")
             return Response({"error": "An unexpected error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-   

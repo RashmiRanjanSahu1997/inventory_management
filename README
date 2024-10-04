@@ -1,0 +1,185 @@
+README File Structure
+Project Title
+Description
+Table of Contents
+Features
+Requirements
+Installation
+Configuration
+Usage
+Authentication
+CRUD Operations
+API Documentation
+Error Handling
+Logging
+Testing
+Contributing
+License
+Contact Information
+Example README Content
+markdown
+Copy code
+# Inventory Management System API
+
+## Description
+This is a RESTful API for an Inventory Management System built using Django Rest Framework, PostgreSQL, and Redis for caching. The API supports CRUD operations on inventory items and is secured using JWT authentication. 
+
+## Table of Contents
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [API Documentation](#api-documentation)
+- [Error Handling](#error-handling)
+- [Logging](#logging)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact Information](#contact-information)
+
+## Features
+- JWT Authentication
+- CRUD operations for inventory items
+- Redis caching for improved performance
+- Error handling with appropriate HTTP status codes
+- Logging for debugging and monitoring
+
+## Requirements
+- Python 3.x
+- Django 3.x or later
+- Django Rest Framework
+- PostgreSQL
+- Redis
+- pip
+
+## Installation
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/RashmiRanjanSahu1997/inventory_management.git
+   cd inventory_management
+Create a virtual environment:
+
+bash
+Copy code
+python3 -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+Install required packages:
+
+bash
+Copy code
+pip install -r requirements.txt
+Set up the database:
+
+Ensure PostgreSQL is installed and running.
+Create a database and user, and grant privileges.
+Run migrations:
+
+bash
+Copy code
+python manage.py migrate
+Run Redis server:
+
+bash
+Copy code
+redis-server
+Start the development server:
+
+bash
+Copy code
+python manage.py runserver
+Configuration
+Update the database settings in settings.py to reflect your PostgreSQL configuration.
+Set the CACHE_TTL variable in settings.py to define cache expiration time.
+Usage
+Authentication
+User Registration
+
+Endpoint: /api/register/
+Method: POST
+Request Body:
+json
+Copy code
+{
+  "username": "yourusername",
+  "password": "yourpassword"
+}
+Login
+
+Endpoint: /api/login/
+Method: POST
+Request Body:
+json
+Copy code
+{
+  "username": "yourusername",
+  "password": "yourpassword"
+}
+Response:
+json
+Copy code
+{
+  "token": "your_jwt_token"
+}
+CRUD Operations
+Create Item
+
+Endpoint: /api/items/
+Method: POST
+Request Body:
+json
+Copy code
+{
+  "name": "Item Name",
+  "description": "Item Description"
+}
+Read Item (by ID)
+
+Endpoint: /api/items/{item_id}/
+Method: GET
+Update Item
+
+Endpoint: /api/items/{item_id}/
+Method: PUT
+Request Body:
+json
+Copy code
+{
+  "name": "Updated Item Name",
+  "description": "Updated Item Description"
+}
+Delete Item
+
+Endpoint: /api/items/{item_id}/
+Method: DELETE
+API Documentation
+The API supports the following endpoints:
+
+User Registration: /api/register/
+User Login: /api/login/
+Create Item: /api/items/
+Read Item: /api/items/{item_id}/
+Update Item: /api/items/{item_id}/
+Delete Item: /api/items/{item_id}/
+Error Handling
+The API returns appropriate HTTP status codes:
+200 OK: Successful request.
+201 Created: Resource created successfully.
+400 Bad Request: Validation errors.
+404 Not Found: Resource not found.
+500 Internal Server Error: Unexpected errors.
+Logging
+The application uses the logging module for tracking API usage, errors, and significant events. Logs can be found in the console or redirected to a file as configured in settings.py.
+Testing
+To run unit tests, use the following command:
+bash
+Copy code
+python manage.py test
+Contributing
+If you'd like to contribute to this project, please fork the repository and submit a pull request with your changes.
+
+License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+Contact Information
+For questions or inquiries, please contact rashmiranjansahu1997@gmail.com.
